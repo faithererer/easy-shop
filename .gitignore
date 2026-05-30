@@ -1,0 +1,7 @@
+node_modules/
+.env
+.playwright-mcp/
+.spec-workflow/
+data/*.json
+data/*.tmp
+*.log

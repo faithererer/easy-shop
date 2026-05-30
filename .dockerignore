@@ -1,0 +1,13 @@
+.env
+.git
+.gitignore
+.playwright-mcp
+.spec-workflow
+data
+node_modules
+npm-debug.log*
+*.log
+Dockerfile
+docker-compose*.yml
+README.md
+tests

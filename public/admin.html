@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>后台管理 - Easy Shop</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="admin-page">
+      <header class="admin-topbar">
+        <div>
+          <p class="eyebrow">Easy Shop Admin</p>
+          <h1>后台管理</h1>
+        </div>
+        <a class="ghost link-button" href="/">返回用户页</a>
+      </header>
+
+      <section class="admin-gate" id="adminGate">
+        <section class="panel admin-login">
+          <div>
+            <h2>管理员验证</h2>
+            <p>输入 .env 中配置的 ADMIN_PASSWORD 后管理商品。</p>
+          </div>
+          <input id="adminPassword" type="password" autocomplete="current-password" placeholder="ADMIN_PASSWORD" />
+          <button class="primary" id="loadProductsBtn" type="button">进入后台</button>
+        </section>
+      </section>
+
+      <section class="admin-workspace hidden" id="adminWorkspace">
+        <div class="section-head">
+          <div>
+            <h2>商品管理</h2>
+            <p>新增、编辑、上下架商品。删除商品不会影响已创建订单。</p>
+          </div>
+          <button class="ghost" id="lockAdminBtn" type="button">锁定后台</button>
+        </div>
+
+        <div class="product-admin">
+          <section class="panel">
+            <div class="panel-head">
+              <h2 id="productFormTitle">新增商品</h2>
+              <button class="ghost hidden" id="cancelEditProductBtn" type="button">取消编辑</button>
+            </div>
+            <form id="productForm" class="form product-form">
+              <input id="productId" type="hidden" />
+              <div class="form-grid">
+                <label>
+                  商品名称
+                  <input id="productName" required placeholder="例如：专业月卡" />
+                </label>
+                <label>
+                  价格
+                  <input id="productPrice" required inputmode="decimal" placeholder="39.90" />
+                </label>
+                <label>
+                  Sub2API 分组 ID
+                  <input id="productGroupId" required inputmode="numeric" placeholder="2" />
+                </label>
+                <label>
+                  有效天数
+                  <input id="productValidityDays" required inputmode="numeric" placeholder="30" />
+                </label>
+                <label>
+                  发放值
+                  <input id="productValue" required inputmode="numeric" placeholder="30" />
+                </label>
+                <label>
+                  排序
+                  <input id="productSort" inputmode="numeric" placeholder="10" />
+                </label>
+              </div>
+              <label>
+                标签
+                <input id="productQuotaLabel" placeholder="30 天" />
+              </label>
+              <label>
+                描述
+                <input id="productDescription" placeholder="适合日常使用" />
+              </label>
+              <label>
+                卖点
+                <textarea id="productFeatures" rows="4" placeholder="每行一个卖点"></textarea>
+              </label>
+              <label class="check-row">
+                <input id="productEnabled" type="checkbox" checked />
+                <span>上架显示</span>
+              </label>
+              <button class="primary" type="submit">保存商品</button>
+            </form>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h2>商品列表</h2>
+              <button class="ghost" id="refreshProductsBtn" type="button">刷新</button>
+            </div>
+            <div class="product-list" id="productList"></div>
+          </section>
+        </div>
+
+        <section class="panel debug-panel">
+          <div class="panel-head">
+            <h2>调试支付成功</h2>
+          </div>
+          <form id="debugCompleteForm" class="form debug-form">
+            <label>
+              订单号
+              <input id="debugOrderId" required placeholder="例如：ES202605..." />
+            </label>
+            <label>
+              网关流水号
+              <input id="debugTradeNo" placeholder="DEBUG-留空自动生成" />
+            </label>
+            <button class="primary" type="submit">模拟支付成功并发放</button>
+          </form>
+          <pre class="debug-result" id="debugResult"></pre>
+        </section>
+
+        <section class="panel debug-panel">
+          <div class="panel-head">
+            <h2>最近订单</h2>
+            <button class="ghost" id="refreshAdminOrdersBtn" type="button">刷新订单</button>
+          </div>
+          <div class="admin-order-list" id="adminOrderList"></div>
+        </section>
+      </section>
+    </main>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="/admin.js"></script>
+  </body>
+</html>

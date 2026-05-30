@@ -1,0 +1,14 @@
+{
+  "name": "easy-shop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sub2API subscription card shop with EasyPay integration",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

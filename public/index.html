@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Easy Shop</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        <span class="brand-mark">ES</span>
+        <div>
+          <strong id="siteName">Easy Shop</strong>
+          <span>Sub2API 发卡站</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <span class="account-chip" id="accountText">未登录</span>
+        <button class="menu-button" id="menuBtn" type="button" aria-expanded="false">菜单</button>
+        <nav class="menu-popover hidden" id="appMenu" aria-label="页面菜单">
+          <button class="menu-item active" type="button" data-view-target="shopView">购买套餐</button>
+          <button class="menu-item" type="button" data-view-target="ordersView">
+            我的订单
+            <strong id="navOrderCount">0</strong>
+          </button>
+          <button class="menu-item" type="button" data-view-target="accountView">账号登录</button>
+          <a class="menu-item" href="/admin">后台管理</a>
+          <button class="menu-item hidden" id="logoutBtn" type="button">退出登录</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+      <header class="page-head">
+        <div>
+          <p class="eyebrow">Subscription checkout</p>
+          <h1 id="pageTitle">购买套餐</h1>
+        </div>
+      </header>
+
+      <section class="view active" id="shopView">
+        <div class="section-head">
+          <div>
+            <h2>选择套餐</h2>
+            <p>使用 Sub2API 账号登录后，下单会绑定到当前账号。</p>
+          </div>
+        </div>
+
+        <div class="plans" id="plans"></div>
+
+        <div class="checkout-panel hidden" id="checkoutPanel">
+          <div class="checkout-main">
+            <span class="label">当前订单</span>
+            <strong id="orderId">-</strong>
+            <span id="orderPlan">-</span>
+          </div>
+          <div class="checkout-meta">
+            <span class="label">状态</span>
+            <strong id="orderStatus">-</strong>
+          </div>
+          <div class="checkout-meta">
+            <span class="label">金额</span>
+            <strong id="orderAmount">-</strong>
+          </div>
+          <div class="checkout-meta">
+            <span class="label">支付倒计时</span>
+            <strong id="orderCountdown">-</strong>
+          </div>
+          <button class="primary hidden" id="payBtn" type="button">继续支付</button>
+          <button class="ghost hidden" id="retryBtn" type="button">重试发放</button>
+        </div>
+      </section>
+
+      <section class="view" id="ordersView">
+        <div class="section-head">
+          <div>
+            <h2>我的订单</h2>
+            <p>查看支付状态、继续未完成支付，或处理发放异常。</p>
+          </div>
+          <button class="ghost" id="refreshOrdersBtn" type="button">刷新</button>
+        </div>
+
+        <div class="filters" id="orderFilters">
+          <button class="active" type="button" data-filter="all">全部</button>
+          <button type="button" data-filter="pending">待支付</button>
+          <button type="button" data-filter="completed">已开通</button>
+          <button type="button" data-filter="problem">异常</button>
+        </div>
+
+        <div class="subscription-summary">
+          <div>
+            <span class="label">当前订阅到期</span>
+            <strong id="ordersSubscriptionExpiresAt">-</strong>
+          </div>
+          <span id="ordersSubscriptionHint">登录 Sub2API 后显示</span>
+        </div>
+
+        <div class="order-table">
+          <div class="order-table-head">
+            <span>套餐</span>
+            <span>订单号</span>
+            <span>金额</span>
+            <span>状态</span>
+            <span class="order-time">支付倒计时/时间</span>
+            <span>操作</span>
+          </div>
+          <div id="ordersList" class="orders-list"></div>
+        </div>
+      </section>
+
+      <section class="view" id="accountView">
+        <div class="account-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Sub2API 登录</h2>
+              <span class="status-pill" id="loginStatusPill">未连接</span>
+            </div>
+
+            <form id="loginForm" class="form">
+              <label>
+                邮箱
+                <input id="email" name="email" autocomplete="email" type="email" required />
+              </label>
+              <label>
+                密码
+                <input id="password" name="password" autocomplete="current-password" type="password" required />
+              </label>
+              <button class="primary" type="submit">登录 Sub2API</button>
+            </form>
+
+            <form id="totpForm" class="form hidden">
+              <label>
+                二次验证码
+                <input id="totpCode" name="totpCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" />
+              </label>
+              <button class="primary" type="submit">完成登录</button>
+            </form>
+          </section>
+
+          <section class="panel profile-panel">
+            <div class="panel-head">
+              <h2>当前账号</h2>
+            </div>
+            <div class="profile">
+              <span class="avatar" id="avatar">--</span>
+              <div>
+                <span class="label">用户 ID</span>
+                <strong id="userId">-</strong>
+                <span class="label">邮箱</span>
+                <strong id="userEmail">-</strong>
+                <span class="label">订阅到期时间</span>
+                <strong id="subscriptionExpiresAt">-</strong>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="/app.js"></script>
+  </body>
+</html>
