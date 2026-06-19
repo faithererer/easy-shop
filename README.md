@@ -46,6 +46,8 @@ EASYPAY_PID=你的商户ID
 EASYPAY_KEY=你的商户密钥
 ```
 
+`PUBLIC_BASE_URL` 必须是易支付服务器能访问到的公网地址，不能是 `localhost`。否则易支付会把通知发到它自己机器的 localhost，本站收不到回调，页面会显示“未通知成功”。
+
 2. 构建并启动：
 
 ```bash
@@ -72,6 +74,18 @@ docker compose down
 
 ```text
 SUB2API_BASE_URL=http://sub2api:8080
+```
+
+如果 Sub2API 跑在宿主机而 Easy Shop 跑在 Docker 容器里，不能写 `http://localhost:8080`，应写：
+
+```text
+SUB2API_BASE_URL=http://host.docker.internal:8080
+```
+
+如果 Sub2API 是公网服务，直接写公网域名，例如：
+
+```text
+SUB2API_BASE_URL=https://sub2api.example.com
 ```
 
 生产环境请把 `PUBLIC_BASE_URL` 改成 HTTPS 域名，并把易支付后台的异步通知地址设置为：
@@ -129,3 +143,13 @@ ORDER_EXPIRE_MINUTES=15
 ```
 
 订单过期后前端会显示“已关闭”，继续支付会被拒绝。若易支付已经成功扣款并发送异步通知，系统仍会按支付成功处理并发放订阅，避免用户付款后丢单。
+
+## 支付成功但未发放
+
+易支付回调验签和金额校验通过后，本站会立即返回 `success`，避免支付平台反复提示通知失败。若 Sub2API 暂时不可达或发放失败，订单会变成“发放失败”，后台 `/admin` 最近订单里点击“模拟成功”或用户订单里“重试发放”即可重新走真实发放流程。
+
+常见部署问题：
+
+- 易支付订单里的通知地址是 `http://localhost:3000/...`：把 `.env` 的 `PUBLIC_BASE_URL` 改成公网 HTTPS 域名，重启容器后重新下单。
+- 日志出现 `Sub2API request timed out` 或 `fetch failed`：容器访问不到 `SUB2API_BASE_URL`，按上面的 Docker 网络说明改地址。
+- 反代后公网打不开 `/payment/notify/easypay`：检查 Nginx/Caddy 是否把该路径转发到 Easy Shop 容器。

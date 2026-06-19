@@ -120,6 +120,7 @@ function createConfig() {
     sub2api: {
       baseUrl: stripTrailingSlash(process.env.SUB2API_BASE_URL || "http://localhost:8080"),
       adminApiKey: process.env.SUB2API_ADMIN_API_KEY || "",
+      timeoutMs: Math.max(1000, Number(process.env.SUB2API_TIMEOUT_MS || 15000)),
       endpoints: {
         login: process.env.SUB2API_LOGIN_PATH || "/api/v1/auth/login",
         login2FA: process.env.SUB2API_LOGIN_2FA_PATH || "/api/v1/auth/login/2fa",

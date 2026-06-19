@@ -156,14 +156,33 @@ class Sub2APIClient {
   }
 
   async requestJson(path, options = {}) {
-    const response = await fetch(joinUrl(this.config.baseUrl, path), {
-      ...options,
-      headers: {
-        Accept: "application/json",
-        ...(options.body ? { "Content-Type": "application/json" } : {}),
-        ...(options.headers || {})
-      }
-    });
+    const url = joinUrl(this.config.baseUrl, path);
+    const timeoutMs = Number(this.config.timeoutMs || 15000);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    let response;
+
+    try {
+      response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+        headers: {
+          Accept: "application/json",
+          ...(options.body ? { "Content-Type": "application/json" } : {}),
+          ...(options.headers || {})
+        }
+      });
+    } catch (error) {
+      const message =
+        error.name === "AbortError"
+          ? `Sub2API request timed out after ${timeoutMs}ms: ${url}`
+          : `Sub2API request failed: ${url} (${error.cause?.code || error.code || error.message})`;
+      const wrapped = new Error(message);
+      wrapped.cause = error;
+      throw wrapped;
+    } finally {
+      clearTimeout(timeout);
+    }
 
     const text = await response.text();
     let json = null;

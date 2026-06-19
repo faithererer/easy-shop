@@ -587,6 +587,38 @@ async function processPaidOrder(order, notifyParams) {
   }
 }
 
+async function markPaidAndTryDeliver(order, notifyParams) {
+  if (order.status === "completed") return { delivered: true };
+  if (toCents(order.amount) !== toCents(notifyParams.money)) {
+    throw new Error(`payment amount mismatch: expected ${order.amount}, got ${notifyParams.money}`);
+  }
+
+  const paidOrder =
+    order.status === "paid" || order.status === "failed"
+      ? await orders.update(order.id, {
+          gatewayTradeNo: notifyParams.trade_no || order.gatewayTradeNo || "",
+          paidAt: order.paidAt || new Date().toISOString(),
+          notifyPayload: notifyParams
+        })
+      : await orders.update(order.id, {
+          status: "paid",
+          gatewayTradeNo: notifyParams.trade_no || "",
+          paidAt: new Date().toISOString(),
+          notifyPayload: notifyParams
+        });
+
+  try {
+    await deliverSubscription(paidOrder);
+    return { delivered: true };
+  } catch (error) {
+    await orders.update(order.id, {
+      status: "failed",
+      failureReason: error.message
+    });
+    return { delivered: false, error };
+  }
+}
+
 async function handleEasyPayNotify(req, res, url) {
   const params =
     req.method === "GET"
@@ -607,9 +639,12 @@ async function handleEasyPayNotify(req, res, url) {
   if (!order) return text(res, 404, "fail");
 
   try {
-    await processPaidOrder(order, params);
+    const result = await markPaidAndTryDeliver(order, params);
+    if (!result.delivered) {
+      console.error(`[notify] order ${orderId} paid but delivery failed:`, result.error);
+    }
   } catch (error) {
-    console.error(`[notify] order ${orderId} delivery failed:`, error);
+    console.error(`[notify] order ${orderId} payment validation failed:`, error);
     return text(res, 500, "fail");
   }
 
